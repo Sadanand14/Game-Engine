@@ -73,6 +73,10 @@
     <IncludePath>$(SolutionDir)Engine\glm;$(SolutionDir)Engine\include;$(SolutionDir)Engine\boost_1_69_0;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)Engine\libraries;$(SolutionDir)Engine\boost_1_69_0\stage\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)Engine\;$(SolutionDir)Engine\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Engine\Libraries;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -92,6 +96,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
