@@ -38,6 +38,7 @@ void SetMoves()
 	comboMoves3.push_back("kickAttack2");
 	comboMoves3.push_back("kickAttack2");
 	movelist.push_back(comboMoves3);
+
 	comboMoves4.push_back("kickAttack2");
 	comboMoves4.push_back("fistAttack1");
 	comboMoves4.push_back("fistAttack2");
@@ -45,13 +46,7 @@ void SetMoves()
 	movelist.push_back(comboMoves4);
 }
 
-void ComboTimer(int x)
-{
-	boolMap[this_thread::get_id()] = true;
-	auto time = chrono::milliseconds(x);
-	this_thread::sleep_for(time);
-	boolMap[this_thread::get_id()] = false;
-}
+
 
 
 
@@ -77,46 +72,37 @@ void Combo_Key_Run(string a)
 		while (comboRunning) 
 		{
 			string x;
-			thread threadObject(&ComboTimer, 5000);
-			thread::id currentID = threadObject.get_id();
+	
 			getline(cin, x);//checks for the next input
-			if (boolMap[currentID]) {
-				threadObject.detach();
-				int t = 0;
-				for (unsigned int i = 0; i < potentialMove.size() + t; i++)
+	//		if (boolMap[currentID]) {
+			int t = 0;
+			for (unsigned int i = 0; i < potentialMove.size() + t; i++)
+			{
+				//cout << potentialMove.size() << "\n";
+				if (potentialMove[i - t][moveNumber] != x)
 				{
-					//cout << potentialMove.size() << "\n";
-					if (potentialMove[i - t][moveNumber] != x)
-					{
-						//cout << potentialMove[i-t][moveNumber] << " -> move removed\n";
-						potentialMove.erase(potentialMove.begin() + i - t);//removes the moveWhich doesnt match anymore
-						t++;
-					}
-				}
-				cout << potentialMove.size() << "\n";
-				if (potentialMove.size() > 0) //checks if there is a move left in the vector
-				{
-					moveNumber++;
-					if (potentialMove.size() == 1)// 
-					{
-						if (potentialMove[0].size() == moveNumber)
-						{
-							cout << "Combo Successfully Executed" << endl;
-							comboRunning = false;
-						}
-					}
-				}
-				else
-				{
-					comboRunning = false;
-					cout << "combo failed" << endl;
+					//cout << potentialMove[i-t][moveNumber] << " -> move removed\n";
+					potentialMove.erase(potentialMove.begin() + i - t);//removes the moveWhich doesnt match anymore
+					t++;
 				}
 			}
-			else 
+			cout << potentialMove.size() << "\n";
+			if (potentialMove.size() > 0) //checks if there is a move left in the vector
 			{
-				threadObject.detach();
-				cout << "Timer OVer!!\n";
+				moveNumber++;
+				if (potentialMove.size() == 1)// 
+				{
+					if (potentialMove[0].size() == moveNumber)
+					{
+						cout << "Combo Successfully Executed" << endl;
+						comboRunning = false;
+					}
+				}
+			}
+			else
+			{
 				comboRunning = false;
+				cout << "combo failed" << endl;
 			}
 		}
 	}
@@ -137,4 +123,3 @@ int main()
 	getchar();
 	return 0;
 }
-

@@ -2,6 +2,7 @@
 #define INPUTMANAGER_H_
 
 #include <GLFW/glfw3.h>
+#include "Timer.h"
 #include <map>
 #include <Vector>
 
@@ -12,7 +13,11 @@ class InputManager
 	static std::map<const char*, int> MenuMouseMap; // mousebutton map for when we are in Main menu
 	
 	static std::vector<std::map<const char*, int>> MapArray1,MapArray2;// Vector for the above maps
+	static std::vector<std::vector<const char*>> ComboMovesList;
+	static std::vector<std::vector<const char*>> PotentialMovesList;
 	
+	static std::chrono::duration<float> lastMoveTime;
+	static int moveIndex;
 	static int contextState;// 2 for now(Menu(Main & Pause) and Fight)
 
 public:
@@ -21,6 +26,8 @@ public:
 	inline std::vector<std::map<const char*, int>>  GetKeyMapArray2() const { return MapArray2; }
 	static void ValidateKeyInput(int);
 	static void ValidateMouseInput(int);
+	static void	CheckForCombo(const char*);
+	static void ContinueCombo(const char*);
 
 private:
 	void Init();
