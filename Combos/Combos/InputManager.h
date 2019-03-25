@@ -8,29 +8,35 @@
 
 class InputManager 
 {
-	static std::map<const char*, int> FightKeyMap; //key map for when we fight
-	static std::map<const char*, int> MenuKeyMap; // key map for when we are in main menu
-	static std::map<const char*, int> MenuMouseMap; // mousebutton map for when we are in Main menu
+	Timer* timer;
+	static InputManager* instance;
+	std::map<const char*, int> FightKeyMap; //key map for when we fight
+	std::map<const char*, int> MenuKeyMap; // key map for when we are in main menu
+	std::map<const char*, int> MenuMouseMap; // mousebutton map for when we are in Main menu
 	
-	static std::vector<std::map<const char*, int>> MapArray1,MapArray2;// Vector for the above maps
-	static std::vector<std::vector<const char*>> ComboMovesList;
-	static std::vector<std::vector<const char*>> PotentialMovesList;
+	std::vector<std::map<const char*, int>> MapArray1,MapArray2;// Vector for the above maps
+	std::vector<std::vector<const char*>> ComboMovesList;
+	std::vector<std::vector<const char*>> PotentialMovesList;
 	
-	static std::chrono::duration<float> lastMoveTime;
-	static int moveIndex;
-	static int contextState;// 2 for now(Menu(Main & Pause) and Fight)
+	std::chrono::duration<float> lastMoveTime;
+	int moveIndex;
+	int contextState;// 2 for now(Menu(Main & Pause) and Fight)
 
 public:
 	InputManager();
+	static InputManager* GetInstance();
+
 	inline std::vector<std::map<const char*, int>>  GetKeyMapArray1() const { return MapArray1; }
 	inline std::vector<std::map<const char*, int>>  GetKeyMapArray2() const { return MapArray2; }
-	static void ValidateKeyInput(int);
-	static void ValidateMouseInput(int);
-	static void	CheckForCombo(const char*);
-	static void ContinueCombo(const char*);
+	
+	void ValidateKeyInput(int);
+	void ValidateMouseInput(int);
+	void CheckForCombo(const char*, std::chrono::duration<float>);
+	void ContinueCombo(const char* x, std::chrono::duration<float> t);
 
 private:
 	void Init();
+	~InputManager();
 	void ConfigureToDefaults();// sets all inputs to default keys
 	//bunch of static callbacks for calling relevant methods from the entity class wrapper/interface for input.
 };

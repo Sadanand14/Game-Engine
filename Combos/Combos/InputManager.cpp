@@ -1,21 +1,32 @@
 #include "InputManager.h"
 #include <iostream>
 
-std::map<const char*, int> InputManager::FightKeyMap;
-std::map<const char*, int> InputManager::MenuKeyMap;
-std::map<const char*, int> InputManager::MenuMouseMap;
-
-std::vector<std::vector<const char*>> InputManager::ComboMovesList;
-std::vector<std::vector<const char*>> InputManager::PotentialMovesList;
-std::vector<std::map<const char*, int>> InputManager::MapArray1, InputManager::MapArray2;
-
-int InputManager::contextState;
-int InputManager::moveIndex;
-std::chrono::duration<float> InputManager::lastMoveTime;
+//std::map<const char*, int> InputManager::FightKeyMap;
+//std::map<const char*, int> InputManager::MenuKeyMap;
+//std::map<const char*, int> InputManager::MenuMouseMap;
+//
+//std::vector<std::vector<const char*>> InputManager::ComboMovesList;
+//std::vector<std::vector<const char*>> InputManager::PotentialMovesList;
+//std::vector<std::map<const char*, int>> InputManager::MapArray1, InputManager::MapArray2;
+//
+//int InputManager::contextState;
+//int InputManager::moveIndex;
+//std::chrono::duration<float> InputManager::lastMoveTime;
+InputManager* InputManager::instance;
 
 InputManager::InputManager()
 {
+	timer = Timer::GetInstance();
 	Init();
+}
+
+InputManager* InputManager::GetInstance() 
+{
+	if (!instance) 
+	{
+		instance = new InputManager();
+	}
+	return instance;
 }
 
 void InputManager::Init() 
@@ -41,7 +52,7 @@ void InputManager::Init()
 	MenuMouseMap["MiddleClick"] = GLFW_MOUSE_BUTTON_MIDDLE;
 	MapArray1.push_back(MenuMouseMap);
 
-	ComboMovesList.push_back({"FistAttack1","FistAttack2","KickAttack1","KickAttack2"});
+	ComboMovesList.push_back({"FistAttack1","FistAttack1","FistAttack1","FistAttack1"});
 	ComboMovesList.push_back({"KickAttack1","KickAttack1","KickAttack2","KickAttack2"});
 	ComboMovesList.push_back({"FistAttack1","KickAttack1","FistAtttack2","KickAttack2" });
 	ComboMovesList.push_back({"KickAttack1","FistAttack1","FistAttack1","KickAttack1"});
@@ -61,18 +72,18 @@ void InputManager::ConfigureToDefaults()
 void InputManager::ValidateKeyInput(int x)
 {
 	using namespace std;
-	for (map<const char*, int>::iterator it = MapArray1[0].begin(); it!=MapArray1[0].end();it++) 
+	for (auto it = MapArray1[0].begin(); it!=MapArray1[0].end();it++) 
 	{
 		if(x==it->second)
 		{
 			cout << it->first << endl;
 			if (moveIndex == 0) 
 			{
-				CheckForCombo(it->first);
+				CheckForCombo(it->first, timer->GetCurrentTime());
 			}
 			else 
 			{
-				ContinueCombo(it->first);
+				ContinueCombo(it->first, timer->GetCurrentTime());
 			}
 		}
 	}
@@ -81,7 +92,7 @@ void InputManager::ValidateKeyInput(int x)
 void InputManager::ValidateMouseInput(int x)
 {
 	using namespace std;
-	for (map<const char*, int>::iterator it = MapArray1[2].begin(); it != MapArray1[2].end(); it++)
+	for (auto it = MapArray1[2].begin(); it != MapArray1[2].end(); it++)
 	{
 		if (x == it->second)
 		{
@@ -90,8 +101,9 @@ void InputManager::ValidateMouseInput(int x)
 	}
 }
 
-void InputManager::CheckForCombo(const char* x) 
+void InputManager::CheckForCombo(const char* x, std::chrono::duration<float> t)
 {
+	lastMoveTime = t;
 	PotentialMovesList.clear();
 	for (int i = 0; i<ComboMovesList.size();i++) 
 	{
@@ -107,7 +119,7 @@ void InputManager::CheckForCombo(const char* x)
 	
 }
 
-void InputManager::ContinueCombo(const char* x) 
+void InputManager::ContinueCombo(const char* x, std::chrono::duration<float> time)
 {
 	int t = 0;
 	for (int i = 0; i < PotentialMovesList.size() + t; i++) 
@@ -118,10 +130,11 @@ void InputManager::ContinueCombo(const char* x)
 			t++;
 		}
 	}
-
-	if (PotentialMovesList.size()>0) 
+	
+	if (PotentialMovesList.size()>0 && std::chrono::milliseconds(500) > std::chrono::duration_cast<std::chrono::milliseconds>(time - lastMoveTime))
 	{
-		if ((PotentialMovesList.size() == 1)&& PotentialMovesList[0].size()==moveIndex) 
+			
+		if ((PotentialMovesList.size() == 1)&& (PotentialMovesList[0].size()-1)==moveIndex) 
 		{
 			std::cout << "Combo Executed!!\n";
 			moveIndex = 0;
@@ -131,11 +144,18 @@ void InputManager::ContinueCombo(const char* x)
 		{
 			moveIndex++;
 		}
+		lastMoveTime = time;
 	}
 	else 
 	{
 		std::cout << "Combo Failed!\n";
 		moveIndex = 0;
-		CheckForCombo(x);
+		CheckForCombo(x, time);
 	}
+	
+}
+
+InputManager::~InputManager() 
+{
+	delete instance;
 }

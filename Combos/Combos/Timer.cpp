@@ -1,8 +1,14 @@
 #include "Timer.h"
 
-Timer::Timer() 
+Timer* Timer::instance;
+Timer::Timer()
 {
 	startTime = std::chrono::high_resolution_clock::now();
+}
+
+Timer::~Timer() 
+{
+	delete instance;
 }
 
 void Timer::Init() 
