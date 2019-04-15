@@ -15,7 +15,6 @@ class ConstantExpression : public Expression
 {
 public:
 	float evaluate();
-
 	float value;
 };
 

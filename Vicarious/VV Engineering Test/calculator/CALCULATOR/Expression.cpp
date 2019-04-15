@@ -7,10 +7,9 @@ float ConstantExpression::evaluate()
 	return value;
 }
 
-BinaryExpression::BinaryExpression()
-:	left(0),
-	right(0)
+BinaryExpression::BinaryExpression():left(0),right(0)
 {
+
 }
 
 BinaryExpression::~BinaryExpression()
